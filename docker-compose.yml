@@ -1,0 +1,43 @@
+# 一键启动：docker compose up --build
+# 启动后打开 http://localhost:5173
+#
+# 两个设计点：
+# 1. 前端 nginx 反代 /api 到 backend 容器，所以只暴露一个端口，
+#    浏览器侧不存在跨域，接口路径也和生产部署完全一致。
+# 2. 后端 SQLite 落在具名卷里，docker compose down 后数据还在；
+#    想清空就 docker compose down -v。
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: danyifen-backend
+    environment:
+      # 不填 DEEPSEEK_API_KEY 也能跑：自动降级到内置规则引擎
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      ANALYZER_MODE: ${ANALYZER_MODE:-auto}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-chat}
+      CONFIDENCE_THRESHOLD: ${CONFIDENCE_THRESHOLD:-0.62}
+      MARGIN_THRESHOLD: ${MARGIN_THRESHOLD:-0.18}
+      DB_PATH: /app/data/tickets.db
+      TZ: Asia/Shanghai
+    volumes:
+      - tickets-data:/app/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: danyifen-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+    restart: unless-stopped
+
+volumes:
+  tickets-data:
