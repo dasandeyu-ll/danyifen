@@ -1,0 +1,18 @@
+# 统一换行符：仓库内一律存 LF，工作区在 Windows 上自动转 CRLF。
+# 不加这个文件，Windows 开发者每次提交都会看到 "LF will be replaced by CRLF" 警告，
+# 而且不同系统的 diff 会因为换行符差异产生大量假变更。
+* text=auto eol=lf
+
+# 二进制资源不做换行转换
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.sqlite binary
+*.db binary
+
+# 这些文件在 Windows 上强制 CRLF 更省心
+*.bat text eol=crlf
+*.cmd text eol=crlf
