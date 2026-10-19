@@ -160,3 +160,7 @@ cd backend
 python tests/smoke_test.py   # 32 项：识别 → 确认 → 非法迁移拒绝 → 统计 → 评测
 python -m app.eval.run_eval rule
 ```
+
+## License
+
+[MIT](./LICENSE)
